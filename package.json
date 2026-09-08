@@ -1,0 +1,31 @@
+{
+  "name": "cafe-restau-images",
+  "version": "1.0.0",
+  "description": "API for cafe and restaurant photos (Express + Cloudinary + PostgreSQL)",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "db:init": "node src/db/init.js"
+  },
+  "keywords": [
+    "cafe",
+    "restaurant",
+    "photos",
+    "api"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "cloudinary": "^1.41.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "multer": "^2.3.0",
+    "multer-storage-cloudinary": "^4.0.0",
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
