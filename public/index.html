@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Menu Media — Produits</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page-bg" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand-block">
+        <a class="brand" href="/">Menu Media</a>
+        <p class="brand-sub">API produits · photo · titre · description</p>
+      </div>
+      <button type="button" class="btn btn-accent" id="open-create">+ Ajouter</button>
+    </header>
+
+    <main class="shell">
+      <section class="toolbar" aria-label="Filtres">
+        <div class="section-pills" role="tablist" aria-label="Section">
+          <button type="button" class="pill is-active" data-section="all" role="tab" aria-selected="true">
+            Tous
+          </button>
+          <button type="button" class="pill" data-section="restaurant" role="tab" aria-selected="false">
+            Restaurant
+          </button>
+          <button type="button" class="pill" data-section="cafe" role="tab" aria-selected="false">
+            Café
+          </button>
+        </div>
+
+        <label class="search">
+          <span class="sr-only">Rechercher</span>
+          <input
+            type="search"
+            id="search"
+            placeholder="Filtrer par titre ou description…"
+            autocomplete="off"
+          />
+        </label>
+
+        <p class="count" id="count">—</p>
+      </section>
+
+      <div id="status" class="status" role="status" hidden></div>
+
+      <section class="grid" id="grid" aria-live="polite"></section>
+    </main>
+
+    <dialog class="sheet" id="sheet">
+      <form id="product-form" class="sheet-form">
+        <header class="sheet-head">
+          <h2 id="sheet-title">Nouveau produit</h2>
+          <button type="button" class="icon-btn" id="sheet-close" aria-label="Fermer">×</button>
+        </header>
+
+        <input type="hidden" name="id" id="form-id" value="" />
+
+        <label class="dropzone" id="dropzone">
+          <input
+            type="file"
+            name="image"
+            id="image-input"
+            accept="image/jpeg,image/png,image/webp"
+          />
+          <span class="dropzone-copy">
+            <strong id="dropzone-title">Image du produit</strong>
+            <span>JPG, PNG ou WebP · max 5 Mo</span>
+          </span>
+          <img id="preview" class="preview" alt="" hidden />
+        </label>
+
+        <label class="field">
+          <span>Section</span>
+          <select name="section" id="form-section" required>
+            <option value="restaurant">Restaurant</option>
+            <option value="cafe">Café</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Titre</span>
+          <input type="text" name="title" id="form-title" placeholder="Nom du produit" required />
+        </label>
+
+        <label class="field">
+          <span>Description</span>
+          <textarea
+            name="description"
+            id="form-description"
+            rows="3"
+            placeholder="Courte description pour le menu…"
+          ></textarea>
+        </label>
+
+        <footer class="sheet-actions">
+          <button type="button" class="btn btn-ghost" id="form-cancel">Annuler</button>
+          <button type="button" class="btn btn-danger" id="form-delete" hidden>Supprimer</button>
+          <button type="submit" class="btn btn-accent" id="form-submit">Enregistrer</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

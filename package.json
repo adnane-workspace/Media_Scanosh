@@ -9,6 +9,9 @@
     "dev": "nodemon src/index.js",
     "db:init": "node src/db/init.js"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "keywords": [
     "cafe",
     "restaurant",
