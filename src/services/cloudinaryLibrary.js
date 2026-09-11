@@ -1,6 +1,4 @@
 import cloudinary from "../cloudinary.js";
-import { getMealById } from "./restaurantApi.js";
-import { getCoffeeById } from "./coffeeApi.js";
 
 /** Cloudinary folders used by this media API */
 export const SECTIONS = {
@@ -8,9 +6,10 @@ export const SECTIONS = {
   cafe: "media/cafe",
 };
 
+/** Prefixes kept so older Cloudinary assets still resolve for edit/delete */
 const PREFIXES = {
-  restaurant: ["mealdb", "ffm", "item"],
-  cafe: ["drink", "coffee", "item"],
+  restaurant: ["mealdb", "ffm", "flux", "item"],
+  cafe: ["drink", "coffee", "flux", "item"],
 };
 
 function folderFor(section) {
@@ -27,15 +26,6 @@ function publicIdFor(section, externalId, prefix = "item") {
   return `${folderFor(section)}/${prefix}_${externalId}`;
 }
 
-function shortDescription(meal) {
-  const fromMeta = [meal.category, meal.area].filter(Boolean).join(" · ");
-  if (meal.instructions) {
-    const first = meal.instructions.split(/\n|\./).map((s) => s.trim()).find(Boolean);
-    if (first) return first.slice(0, 160);
-  }
-  return fromMeta || "";
-}
-
 /** Shape for the menu app: photo + title + description only */
 export function toMenuItem(item) {
   return {
@@ -44,6 +34,7 @@ export function toMenuItem(item) {
     title: item.name || item.title || "",
     description: item.description || "",
     image: item.image,
+    createdAt: item.createdAt || null,
   };
 }
 
@@ -70,6 +61,7 @@ function mapResource(resource, section) {
     }),
     cloudinaryId: resource.public_id,
     externalSource: ctx.external_source || null,
+    createdAt: resource.created_at || null,
   };
 }
 
@@ -90,13 +82,20 @@ async function resolvePublicId(section, externalId) {
 
 export async function listLibrary(section) {
   if (section) {
-    const result = await cloudinary.api.resources({
-      type: "upload",
-      prefix: `${folderFor(section)}/`,
-      max_results: 100,
-      context: true,
-    });
-    return (result.resources || []).map((r) => mapResource(r, section));
+    const resources = [];
+    let nextCursor;
+    do {
+      const result = await cloudinary.api.resources({
+        type: "upload",
+        prefix: `${folderFor(section)}/`,
+        max_results: 500,
+        context: true,
+        next_cursor: nextCursor,
+      });
+      resources.push(...(result.resources || []));
+      nextCursor = result.next_cursor;
+    } while (nextCursor);
+    return resources.map((r) => mapResource(r, section));
   }
 
   const [restaurant, cafe] = await Promise.all([
@@ -160,6 +159,57 @@ export async function createLibraryItem(section, { title, description, file }) {
   );
 }
 
+/** Import a remote / data-URI image into Cloudinary library (Flux). */
+export async function importFromImageUrl(
+  section,
+  { id, title, description, imageUrl, source = "flux" }
+) {
+  const name = (title || "").trim();
+  if (!name) {
+    const err = new Error("title is required");
+    err.status = 400;
+    throw err;
+  }
+  if (!imageUrl) {
+    const err = new Error("imageUrl is required");
+    err.status = 400;
+    throw err;
+  }
+
+  const externalId = id || `flux-${Date.now()}`;
+  const prefix = source === "flux" ? "flux" : "item";
+  const publicId = publicIdFor(section, externalId, prefix);
+  const desc = (description || "").trim().slice(0, 500);
+
+  const upload = await cloudinary.uploader.upload(imageUrl, {
+    public_id: publicId,
+    overwrite: true,
+    tags: [section, "menu", source, "ai"].filter(Boolean),
+    context: {
+      external_id: externalId,
+      external_source: source,
+      name,
+      description: desc,
+      section,
+    },
+  });
+
+  return mapResource(
+    {
+      ...upload,
+      context: {
+        custom: {
+          external_id: externalId,
+          external_source: source,
+          name,
+          description: desc,
+        },
+      },
+    },
+    section
+  );
+}
+
 export async function updateLibraryItem(section, externalId, { title, description, file }) {
   const publicId = await resolvePublicId(section, externalId);
   if (!publicId) {
@@ -199,159 +249,4 @@ export async function deleteLibraryItem(section, externalId) {
     if (result.result === "ok") return true;
   }
   return true;
-}
-
-export async function importRestaurantFromMealdb(mealId) {
-  const meal = await getMealById(mealId);
-  if (!meal?.image) {
-    const err = new Error("Meal not found or has no image");
-    err.status = 404;
-    throw err;
-  }
-
-  const isFfm = meal.source === "freefoodmenus" || String(meal.id).startsWith("ffm-");
-  const prefix = isFfm ? "ffm" : "mealdb";
-  const publicId = publicIdFor("restaurant", meal.id, prefix);
-  const description = isFfm
-    ? (meal.description || "").slice(0, 220)
-    : shortDescription(meal);
-
-  const upload = await cloudinary.uploader.upload(meal.image, {
-    public_id: publicId,
-    overwrite: true,
-    tags: ["restaurant", "menu", meal.source || prefix, meal.category, meal.area].filter(
-      Boolean
-    ),
-    context: {
-      external_id: meal.id,
-      mealdb_id: isFfm ? "" : meal.id,
-      external_source: meal.source || "themealdb",
-      name: meal.name,
-      category: meal.category || "",
-      area: meal.area || "",
-      description,
-      section: "restaurant",
-    },
-  });
-
-  return mapResource(
-    {
-      ...upload,
-      context: {
-        custom: {
-          external_id: meal.id,
-          mealdb_id: isFfm ? "" : meal.id,
-          external_source: meal.source || "themealdb",
-          name: meal.name,
-          category: meal.category || "",
-          area: meal.area || "",
-          description,
-        },
-      },
-    },
-    "restaurant"
-  );
-}
-
-export async function importCafeFromCoffeeApi(coffeeId) {
-  const drink = await getCoffeeById(coffeeId);
-  if (!drink?.image) {
-    const err = new Error("Coffee drink not found or has no image");
-    err.status = 404;
-    throw err;
-  }
-
-  const publicId = publicIdFor("cafe", drink.id, "drink");
-  const description = (drink.description || "").slice(0, 220);
-
-  const upload = await cloudinary.uploader.upload(drink.image, {
-    public_id: publicId,
-    overwrite: true,
-    tags: ["cafe", "menu", drink.source, drink.type].filter(Boolean),
-    context: {
-      external_id: drink.id,
-      external_source: drink.source,
-      name: drink.title,
-      category: drink.type || drink.category || "cafe",
-      description,
-      section: "cafe",
-    },
-  });
-
-  return mapResource(
-    {
-      ...upload,
-      context: {
-        custom: {
-          external_id: drink.id,
-          external_source: drink.source,
-          name: drink.title,
-          category: drink.type || drink.category || "cafe",
-          description,
-        },
-      },
-    },
-    "cafe"
-  );
-}
-
-/** Import many MealDB ids sequentially (safer for rate limits). */
-export async function importManyMeals(ids) {
-  const unique = [...new Set(ids.map(String).filter(Boolean))];
-  const results = { imported: [], failed: [] };
-
-  for (const id of unique) {
-    try {
-      const item = await importRestaurantFromMealdb(id);
-      results.imported.push(toMenuItem(item));
-    } catch (err) {
-      results.failed.push({ id, error: err.message || "import failed" });
-    }
-  }
-
-  return {
-    total: unique.length,
-    success: results.imported.length,
-    failed: results.failed.length,
-    items: results.imported,
-    errors: results.failed,
-  };
-}
-
-export async function importManyCoffees(ids) {
-  const unique = [...new Set(ids.map(String).filter(Boolean))];
-  const results = { imported: [], failed: [] };
-
-  for (const id of unique) {
-    try {
-      const item = await importCafeFromCoffeeApi(id);
-      results.imported.push(toMenuItem(item));
-    } catch (err) {
-      results.failed.push({ id, error: err.message || "import failed" });
-    }
-  }
-
-  return {
-    total: unique.length,
-    success: results.imported.length,
-    failed: results.failed.length,
-    items: results.imported,
-    errors: results.failed,
-  };
-}
-
-export async function listImportedMeals() {
-  return listLibrary("restaurant");
-}
-
-export async function getImportedMeal(mealdbId) {
-  return getLibraryItem("restaurant", mealdbId);
-}
-
-export async function importMeal(mealdbId) {
-  return importRestaurantFromMealdb(mealdbId);
-}
-
-export async function deleteImportedMeal(mealdbId) {
-  return deleteLibraryItem("restaurant", mealdbId);
 }

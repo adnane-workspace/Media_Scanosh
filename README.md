@@ -1,40 +1,52 @@
 # Menu Media API
 
-Scrape d’APIs → Cloudinary → app de création de menu.
+Photos menu café / restaurant → Cloudinary (+ génération Flux.2 Klein).
 
 ## App menu (CRUD)
 
 ```http
 GET    /library?section=restaurant|cafe
 POST   /library/:section
-       multipart/form-data: image, title, description
 PATCH  /library/:section/:id
-       title, description, optional image
 DELETE /library/:section/:id
 ```
 
 Champs : `id`, `title`, `description`, `image`
 
-## Sources
+## Génération Flux.2 Klein
 
-| Section | API externe | Dossier Cloudinary |
-|---------|-------------|--------------------|
-| Restaurant | TheMealDB + Free Food Menus | `media/restaurant` |
-| Café | TheCocktailDB + DummyJSON | `media/cafe` |
+1. Clé [build.nvidia.com](https://build.nvidia.com) → `NVIDIA_API_KEY=nvapi-...` dans `.env`
+2. Générer :
 
-## Admin UI
+```bash
+npm run flux:cafe
+npm run flux:restaurant
+npm run flux:moroccan
+npm run flux:generate -- --section=cafe --limit=10
+```
 
-http://localhost:3000
+```http
+GET  /flux/catalog
+POST /flux/prompt          { "prompt", "title", "section" }
+POST /flux/generate/:id
+POST /flux/generate-batch  { "section", "limit" }
+```
 
-1. Filtrer par section / recherche
-2. Ajouter / modifier / supprimer un produit
+## Catalogue produits (par catégorie)
+
+```
+src/data/catalog/
+  helpers.js
+  cafe/          coffee, tea, juices, iceCream, …
+  restaurant/    burgers, pizza, pasta, … + moroccan/
+  index.js
+```
+
+`fluxCatalog.js` réexporte tout (API / scripts inchangés).
+
+
+http://localhost:3000 — Mes photos + Créer avec l’IA
 
 ## Déploiement Vercel
 
-Production : https://cafe-restau-images.vercel.app
-
-```bash
-npx vercel deploy --prod
-```
-
-Variables d’environnement requises : `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `MEALDB_API_KEY`
+Variables : `CLOUDINARY_*`, `NVIDIA_API_KEY`

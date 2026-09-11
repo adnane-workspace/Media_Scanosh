@@ -4,10 +4,8 @@ import { fileURLToPath } from "url";
 import express from "express";
 import cors from "cors";
 import multer from "multer";
-import photosRouter from "./routes/photos.js";
-import restaurantRouter from "./routes/restaurant.js";
-import cafeRouter from "./routes/cafe.js";
 import libraryRouter from "./routes/library.js";
+import fluxRouter from "./routes/flux.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "..", "public");
@@ -30,19 +28,17 @@ app.get("/api", (_req, res) => {
       update: "PATCH /library/:section/:id { title, description } optional image",
       delete: "DELETE /library/:section/:id",
     },
-    admin: {
-      restaurantBrowse: "GET /restaurant/meals",
-      restaurantSaveAll: "POST /restaurant/meals/import-all",
-      cafeBrowse: "GET /cafe/drinks?type=hot|iced|all",
-      cafeSaveAll: "POST /cafe/drinks/import-all",
+    flux: {
+      catalog: "GET /flux/catalog",
+      generate: "POST /flux/generate/:id",
+      batch: "POST /flux/generate-batch { section, limit }",
+      prompt: "POST /flux/prompt { prompt, title, section }",
     },
   });
 });
 
 app.use("/library", libraryRouter);
-app.use("/restaurant", restaurantRouter);
-app.use("/cafe", cafeRouter);
-app.use("/photos", photosRouter);
+app.use("/flux", fluxRouter);
 
 app.use((err, _req, res, _next) => {
   console.error(err);

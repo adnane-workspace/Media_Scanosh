@@ -1,0 +1,27 @@
+import { cafeItem as item } from "../helpers.js";
+
+export const TEA = [
+  item("Latte matcha", "Thé vert matcha crémeux.", "matcha latte with green swirl in a ceramic cup", "matcha-latte"),
+  item("Matcha glacé", "Matcha servi froid.", "iced matcha latte over ice in a glass", "iced-matcha"),
+  item("Limonade matcha", "Matcha et citronnade.", "matcha lemonade layered green and yellow drink", "matcha-lemonade"),
+  item("Latte chai", "Épices chai et lait.", "chai latte with cinnamon dusting", "chai-latte"),
+  item("Thé chai glacé", "Épices, lait froid.", "iced chai latte with ice and cinnamon stick"),
+  item("Thé Earl Grey", "Bergamote.", "cup of earl grey tea with steam and lemon slice", "the-earl-grey"),
+  item("Thé petit-déjeuner anglais", "Thé noir classique.", "english breakfast tea in a porcelain cup with milk jug", "the-english-breakfast"),
+  item("Thé vert sencha", "Notes végétales.", "japanese green sencha tea in a ceramic cup"),
+  item("Thé au jasmin", "Thé vert parfumé au jasmin.", "jasmine green tea in a glass cup with jasmine flowers", "the-jasmine"),
+  item("Thé oolong", "Thé semi-oxydé.", "oolong tea in a traditional porcelain cup"),
+  item("Thé rooibos", "Sans théine, rouge.", "rooibos tea amber red in a glass mug"),
+  item("Thé glacé à la pêche", "Pêche, thé noir.", "peach iced tea with peach slices and ice", "the-glace-peche"),
+  item("Thé glacé au citron", "Thé noir citronné.", "lemon iced tea with lemon slices and ice", "the-glace-citron"),
+  item("Thé glacé à la menthe", "Menthe fraîche glacée.", "mint iced tea with fresh mint leaves", "the-glace-menthe"),
+  item("Infusion à la menthe", "Menthe fraîche.", "fresh mint tea in a clear glass teapot", "infusion-menthe"),
+  item("Infusion à la camomille", "Fleurs de camomille.", "chamomile tea with dried flowers visible", "infusion-camomille"),
+  item("Infusion gingembre-citron", "Chaud, réconfortant.", "ginger lemon herbal tea steaming in a mug", "infusion-gingembre-citron"),
+  item("Infusion à l'hibiscus", "Fleurs d'hibiscus, rouge.", "hibiscus tea deep red in a glass cup", "infusion-hibiscus"),
+  item("Infusion à la verveine", "Verveine apaisante.", "verbena herbal tea in a white cup", "infusion-verveine"),
+  item("Thé aux perles tapioca", "Perles de tapioca, thé au lait.", "bubble tea with tapioca pearls in a clear cup with straw", "bubble-tea-tapioca"),
+  item("Thé aux perles matcha", "Matcha et perles.", "matcha bubble tea with black tapioca pearls", "bubble-tea-matcha"),
+  item("Thé aux perles taro", "Taro violet, perles.", "taro bubble tea purple drink with tapioca pearls", "bubble-tea-taro"),
+  item("Thé aux perles cassonade", "Cassonade, perles.", "brown sugar bubble tea with marble milk effect", "bubble-tea-brown-sugar"),
+];

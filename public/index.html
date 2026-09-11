@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Syne:wght@700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles.css" />
@@ -17,37 +17,227 @@
 
     <header class="topbar">
       <div class="brand-block">
-        <a class="brand" href="/">Menu Media</a>
-        <p class="brand-sub">API produits · photo · titre · description</p>
+        <a class="brand" href="/">Menu <span>Media</span></a>
+        <p class="brand-sub">Créez et organisez les photos de votre carte</p>
       </div>
-      <button type="button" class="btn btn-accent" id="open-create">+ Ajouter</button>
+      <div class="topbar-actions">
+        <button type="button" class="btn btn-ghost" id="open-generate">
+          <span class="btn-ico" aria-hidden="true">✦</span>
+          Créer une photo
+        </button>
+        <button type="button" class="btn btn-accent" id="open-create">
+          <span class="btn-ico" aria-hidden="true">+</span>
+          Importer
+        </button>
+      </div>
     </header>
 
     <main class="shell">
-      <section class="toolbar" aria-label="Filtres">
-        <div class="section-pills" role="tablist" aria-label="Section">
-          <button type="button" class="pill is-active" data-section="all" role="tab" aria-selected="true">
-            Tous
+      <section class="control-panel" aria-label="Contrôles">
+        <nav class="view-tabs" aria-label="Vue">
+          <button type="button" class="view-tab is-active" data-view="library">
+            Mes photos
           </button>
-          <button type="button" class="pill" data-section="restaurant" role="tab" aria-selected="false">
-            Restaurant
+          <button type="button" class="view-tab" data-view="studio">
+            Créer avec l’IA
           </button>
-          <button type="button" class="pill" data-section="cafe" role="tab" aria-selected="false">
-            Café
-          </button>
+        </nav>
+
+        <div class="toolbar" id="library-toolbar">
+          <div class="section-pills" role="tablist" aria-label="Filtrer les photos">
+            <button type="button" class="pill is-active" data-section="all" role="tab" aria-selected="true">
+              Tous <span class="pill-count" data-count="all">0</span>
+            </button>
+            <button type="button" class="pill" data-section="restaurant" role="tab" aria-selected="false">
+              Restaurant <span class="pill-count" data-count="restaurant">0</span>
+            </button>
+            <button type="button" class="pill" data-section="cafe" role="tab" aria-selected="false">
+              Café <span class="pill-count" data-count="cafe">0</span>
+            </button>
+          </div>
+
+          <label class="search">
+            <span class="search-ico" aria-hidden="true">⌕</span>
+            <span class="sr-only">Rechercher</span>
+            <input
+              type="search"
+              id="search"
+              placeholder="Filtrer par nom ou description…"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="sort">
+            <span class="sr-only">Trier</span>
+            <select id="sort" aria-label="Trier les photos">
+              <option value="recent">Plus récents</option>
+              <option value="oldest">Plus anciens</option>
+              <option value="az">Nom A → Z</option>
+              <option value="za">Nom Z → A</option>
+              <option value="section">Café puis resto</option>
+            </select>
+          </label>
+
+          <p class="count" id="count">—</p>
+        </div>
+      </section>
+
+      <section class="studio" id="studio" aria-label="Studio de génération" hidden>
+        <div class="studio-copy">
+          <p class="gen-kicker">Photo menu · IA</p>
+          <h2 class="studio-title">Créer une photo produit</h2>
+          <p class="studio-sub">
+            Choisissez un exemple ou décrivez le plat. L’image est enregistrée automatiquement dans vos photos.
+          </p>
         </div>
 
-        <label class="search">
-          <span class="sr-only">Rechercher</span>
-          <input
-            type="search"
-            id="search"
-            placeholder="Filtrer par titre ou description…"
-            autocomplete="off"
-          />
-        </label>
+        <form id="prompt-form" class="studio-form">
+          <div class="syntax-guide" aria-label="Aide au prompt">
+            <p class="syntax-label">Démarrer rapidement</p>
+            <div class="syntax-examples" role="group" aria-label="Exemples">
+              <button type="button" class="chip" data-example="cappuccino">Cappuccino</button>
+              <button type="button" class="chip" data-example="burger">Burger</button>
+              <button type="button" class="chip" data-example="tajine">Tajine</button>
+              <button type="button" class="chip" data-example="couscous">Couscous</button>
+              <button type="button" class="chip" data-example="glace">Glace</button>
+              <button type="button" class="chip" data-example="jus">Jus d’orange</button>
+              <button type="button" class="chip" data-example="pizza">Pizza</button>
+            </div>
+            <p class="syntax-formula" aria-hidden="true">
+              <span class="syntax-part">sujet</span>
+              <span class="syntax-dot">·</span>
+              <span class="syntax-part">contenant</span>
+              <span class="syntax-dot">·</span>
+              <span class="syntax-part">détails</span>
+              <span class="syntax-dot">·</span>
+              <span class="syntax-part">ambiance</span>
+            </p>
+          </div>
 
-        <p class="count" id="count">—</p>
+          <label class="field">
+            <span>Produit <em>(en anglais pour de meilleurs résultats)</em></span>
+            <input
+              type="text"
+              id="prompt-subject"
+              name="subject"
+              required
+              placeholder="ex. cappuccino with latte art heart"
+              autocomplete="off"
+            />
+          </label>
+
+          <div class="field-row">
+            <label class="field">
+              <span>Contenant</span>
+              <input
+                type="text"
+                id="prompt-vessel"
+                name="vessel"
+                placeholder="white ceramic cup"
+                autocomplete="off"
+              />
+            </label>
+            <label class="field field-grow">
+              <span>Détails</span>
+              <input
+                type="text"
+                id="prompt-details"
+                name="details"
+                placeholder="microfoam, cocoa dust"
+                autocomplete="off"
+              />
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Ambiance</span>
+            <input
+              type="text"
+              id="prompt-mood"
+              name="mood"
+              list="mood-presets"
+              placeholder="soft natural light, clean white background"
+              autocomplete="off"
+            />
+            <datalist id="mood-presets">
+              <option value="soft natural light, clean white background"></option>
+              <option value="studio lighting, pure white background, centered"></option>
+              <option value="warm café atmosphere, wooden table"></option>
+              <option value="dark plate, moody restaurant lighting"></option>
+            </datalist>
+          </label>
+
+          <details class="prompt-live">
+            <summary>
+              <span>Voir le prompt technique</span>
+              <button type="button" class="btn-link" id="prompt-copy" hidden>Copier</button>
+            </summary>
+            <pre class="prompt-live-text" id="prompt-composed" aria-live="polite">—</pre>
+            <textarea id="prompt-text" name="prompt" class="sr-only" required tabindex="-1" aria-hidden="true"></textarea>
+          </details>
+
+          <div class="field-row">
+            <label class="field">
+              <span>Catégorie</span>
+              <select id="prompt-section" name="section" required>
+                <option value="cafe">Café</option>
+                <option value="restaurant">Restaurant</option>
+              </select>
+            </label>
+            <label class="field field-grow">
+              <span>Nom sur le menu</span>
+              <input
+                type="text"
+                id="prompt-title"
+                name="title"
+                required
+                placeholder="Ex. : Cappuccino"
+                autocomplete="off"
+              />
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Description menu <em>(optionnel)</em></span>
+            <textarea
+              id="prompt-description"
+              name="description"
+              rows="2"
+              placeholder="Courte phrase pour le menu…"
+            ></textarea>
+          </label>
+
+          <div class="studio-actions">
+            <button type="submit" class="btn btn-accent" id="prompt-submit">
+              <span class="btn-ico" aria-hidden="true">✦</span>
+              <span class="btn-label">Générer la photo</span>
+            </button>
+          </div>
+        </form>
+
+        <aside class="studio-result" id="studio-result">
+          <div class="studio-result-frame" id="studio-result-frame">
+            <div class="studio-placeholder" id="studio-placeholder">
+              <p>L’aperçu apparaîtra ici</p>
+              <span>Comptez 10 à 30 secondes</span>
+            </div>
+            <div class="studio-loading" id="studio-loading" hidden>
+              <div class="studio-spinner" aria-hidden="true"></div>
+              <p>Génération en cours…</p>
+            </div>
+            <img id="studio-preview" class="studio-preview" alt="Aperçu généré" hidden />
+          </div>
+          <div class="studio-result-meta">
+            <p class="studio-result-kicker" id="studio-result-kicker">En attente</p>
+            <strong id="studio-result-title">Aucune photo encore</strong>
+            <p id="studio-result-desc" class="studio-result-desc">
+              Remplissez le formulaire à gauche, puis lancez la génération.
+            </p>
+            <button type="button" class="btn btn-ghost" id="studio-to-library" hidden>
+              Voir dans mes photos
+            </button>
+          </div>
+        </aside>
       </section>
 
       <div id="status" class="status" role="status" hidden></div>
@@ -58,7 +248,10 @@
     <dialog class="sheet" id="sheet">
       <form id="product-form" class="sheet-form">
         <header class="sheet-head">
-          <h2 id="sheet-title">Nouveau produit</h2>
+          <div>
+            <p class="sheet-kicker" id="sheet-kicker">Produit</p>
+            <h2 id="sheet-title">Nouveau produit</h2>
+          </div>
           <button type="button" class="icon-btn" id="sheet-close" aria-label="Fermer">×</button>
         </header>
 
@@ -72,24 +265,25 @@
             accept="image/jpeg,image/png,image/webp"
           />
           <span class="dropzone-copy">
-            <strong id="dropzone-title">Image du produit</strong>
-            <span>JPG, PNG ou WebP · max 5 Mo</span>
+            <strong id="dropzone-title">Ajouter une image</strong>
+            <span>Glisser-déposer · JPG, PNG, WebP · max 5 Mo</span>
           </span>
           <img id="preview" class="preview" alt="" hidden />
         </label>
 
-        <label class="field">
-          <span>Section</span>
-          <select name="section" id="form-section" required>
-            <option value="restaurant">Restaurant</option>
-            <option value="cafe">Café</option>
-          </select>
-        </label>
-
-        <label class="field">
-          <span>Titre</span>
-          <input type="text" name="title" id="form-title" placeholder="Nom du produit" required />
-        </label>
+        <div class="field-row">
+          <label class="field">
+            <span>Section</span>
+            <select name="section" id="form-section" required>
+              <option value="restaurant">Restaurant</option>
+              <option value="cafe">Café</option>
+            </select>
+          </label>
+          <label class="field field-grow">
+            <span>Titre</span>
+            <input type="text" name="title" id="form-title" placeholder="Nom du produit" required />
+          </label>
+        </div>
 
         <label class="field">
           <span>Description</span>

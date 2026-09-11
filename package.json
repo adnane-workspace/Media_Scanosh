@@ -1,13 +1,16 @@
 {
   "name": "cafe-restau-images",
   "version": "1.0.0",
-  "description": "API for cafe and restaurant photos (Express + Cloudinary + PostgreSQL)",
+  "description": "API + UI for cafe and restaurant menu photos (Express + Cloudinary + Flux)",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "db:init": "node src/db/init.js"
+    "flux:generate": "node src/scripts/generateFluxLibrary.js",
+    "flux:cafe": "node src/scripts/generateFluxLibrary.js --section=cafe",
+    "flux:restaurant": "node src/scripts/generateFluxLibrary.js --section=restaurant",
+    "flux:moroccan": "node src/scripts/generateFluxLibrary.js --moroccan"
   },
   "engines": {
     "node": ">=20"
@@ -16,7 +19,8 @@
     "cafe",
     "restaurant",
     "photos",
-    "api"
+    "api",
+    "flux"
   ],
   "license": "MIT",
   "dependencies": {
@@ -24,9 +28,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "multer": "^2.3.0",
-    "multer-storage-cloudinary": "^4.0.0",
-    "pg": "^8.23.0"
+    "multer": "^2.3.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
