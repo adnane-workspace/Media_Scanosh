@@ -19,7 +19,7 @@ app.use(express.static(publicDir));
 
 app.get("/api", (_req, res) => {
   res.json({
-    name: "Menu Media API",
+    name: "Media Scanosh API",
     forMenuApp: {
       restaurants: "GET /library?section=restaurant",
       cafes: "GET /library?section=cafe",

@@ -1,7 +1,7 @@
 {
-  "name": "cafe-restau-images",
+  "name": "media-scanosh",
   "version": "1.0.0",
-  "description": "API + UI for cafe and restaurant menu photos (Express + Cloudinary + Flux)",
+  "description": "Media Scanosh — photos menu café/restaurant (Cloudinary + Flux)",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
